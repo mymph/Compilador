@@ -7,8 +7,6 @@ Ex.: o número 25432 de entrada será um token, em vez de cada número ser um to
 - Token é um terminal. Possui atributos com informações adicionais sobre o símbolo.
 Ex.: valor, tipo, escopo, etc.'''
 
-
-
 class Lexer:
   def __init__(self):
     self.tokens: list[Token] = []
