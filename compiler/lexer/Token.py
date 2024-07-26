@@ -6,6 +6,6 @@ class Token:
     self.line = line
 
   def __str__(self):
-    str = f'({self.token}: "{self.lexeme}" - L{self.line}), '
+    str = f'(token: "{self.token}"; lexema: "{self.lexeme}" - Linha {self.line}), '
     
     return str
