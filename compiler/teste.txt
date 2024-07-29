@@ -1,5 +1,25 @@
-abc while 
-function 
-x2 33 
-555 666
-4bw
+program MeuPrograma;
+int a, b, c;
+function soma(x, y) : int {
+    return x + y;
+}
+procedure imprimeSoma(a, b) {
+    print(soma(a, b));
+}
+{
+    a = 10;
+    b = 20;
+    if (a < b) {
+        print(a);
+    } else {
+        print(b);
+    }
+    while (a != 0) {
+        a = a - 1;
+        if (a == 5) {
+            break;
+        }
+        continue;
+    }
+    input();
+}

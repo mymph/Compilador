@@ -1,4 +1,5 @@
-from lexer.Lexer import Lexer
+from lexer.lexer import Lexer
+from parser.parser import Parser
 
 lraw_code = ''
 
@@ -16,3 +17,13 @@ for token in tokens:
     print('\n')
 
  
+# Inicialização do Parser com o Lexer
+parser = Parser(lexer)
+
+
+# Execução do Parser
+try:
+    parser.programa()  # Inicia a análise sintática a partir do ponto de entrada 'programa'
+    print("Parsing completed successfully!")
+except SyntaxError as e:
+    print(f"Syntax error: {e}")
