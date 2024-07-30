@@ -153,8 +153,9 @@ class Parser:
 
     def comandos(self): #entra em loop enquanto o token atual estiver em {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT'}.
         print("[comandos] Analisando comandos")
+         #!!!!!!!!! essa verificação de return não seria aqui e sim em da função de FUNCTION
         # Verifica se current_token é None antes de acessar o atributo token (p impedir a análise de continuar se o current_token for none)
-        while self.current_token and self.current_token.token in {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT', 'BREAK', 'CONTINUE'}:
+        while self.current_token and self.current_token.token in {'IDENTIFIER', 'IF', 'WHILE', 'INPUT', 'PRINT', 'BREAK', 'CONTINUE'}:
             self.comando() #Para cada token válido, chama o método comando()
 
     def comando(self): #ida com um comando específico com base no tipo de token atual
@@ -165,8 +166,8 @@ class Parser:
             self.comando_condicional()
         elif self.current_token.token == 'WHILE':
             self.comando_enquanto()
-        elif self.current_token.token == 'RETURN':
-            self.retorno()
+        # elif self.current_token.token == 'RETURN': # !!!!! de acordo com a gramatica a verificação de return fica dentro de <declaração de função>
+        #     self.retorno()
         elif self.current_token.token == 'INPUT':
             self.comando_leitura()
         elif self.current_token.token == 'PRINT':
