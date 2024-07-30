@@ -23,7 +23,7 @@ class Lexer:
         self.symbols_table: list[Symbol] = []
         self.char_index = 0  # Índice do caractere que está sendo lido
         self.current_line = 1  # Linha do caractere que está sendo lido
-        self.code = code
+        self.code = code # arquivo
 
     def is_delimiter(self, char: str):
         for key_token, lexeme_value in DELIMITERS.items():
@@ -120,7 +120,7 @@ class Lexer:
             if state is None and term not in (' ', '\n', '', '\t'):
                 print(f"{RED} Erro {RESET}")
 
-        self.add_token_based_on_state(term, state)
+        self.add_token_based_on_state(term, state) #adiciona o token a lista 
 
         if not end_of_file:
             if char == '\n':
