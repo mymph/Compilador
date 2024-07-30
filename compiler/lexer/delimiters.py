@@ -12,13 +12,11 @@ DELIMITERS = {
     'GREATER_THAN_OP': '>',
     'GREATER_OR_EQ_OP': '>=',
     'ADD': '+',
-    'LESS': '-',
+    'SUB': '-',
     'MULT': '*',
     'DIV': '/',
     'AND': '&&',
     'OR': '||',
     'COMMA': ',',
-
-    #ADICIONEI
     'COLON': ':'
 }

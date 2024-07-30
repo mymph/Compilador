@@ -52,12 +52,13 @@ class Parser:
     #método p corpo do programa, pode incluir declarações de variáveis, sub-rotinas e comandos.
     def corpo(self):
         print("[corpo] Analisando corpo")
-        while self.current_token and self.current_token.token in ('INT', 'BOOL', 'HEADER_FUNC', 'HEADER_PROC'):
+        while self.current_token:
             if self.current_token.token in ('INT', 'BOOL'):
                 self.declaracao_de_variaveis()
             elif self.current_token.token in ('HEADER_FUNC', 'HEADER_PROC'):
                 self.declaracao_de_sub_rotinas()
-        
+            else:
+                break
         self.comandos()
 
 
@@ -152,7 +153,8 @@ class Parser:
 
     def comandos(self): #entra em loop enquanto o token atual estiver em {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT'}.
         print("[comandos] Analisando comandos")
-        while self.current_token.token in {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT'}:
+        # Verifica se current_token é None antes de acessar o atributo token (p impedir a análise de continuar se o current_token for none)
+        while self.current_token and self.current_token.token in {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT', 'BREAK', 'CONTINUE'}:
             self.comando() #Para cada token válido, chama o método comando()
 
     def comando(self): #ida com um comando específico com base no tipo de token atual
@@ -169,6 +171,10 @@ class Parser:
             self.comando_leitura()
         elif self.current_token.token == 'PRINT':
             self.comando_escrita()
+        elif self.current_token.token == 'BREAK':
+            self.comando_de_parada()
+        elif self.current_token.token == 'CONTINUE':
+            self.comando_de_continuacao()
 
     def atribuicao_ou_chamada(self):
         print("[atribuicao_ou_chamada] Analisando atribuicao ou chamada")
@@ -228,10 +234,6 @@ class Parser:
         self.consume_token('CLOSE_PARENTHESES')
         self.consume_token('OPEN_BRACKET')
         self.comandos() #chama o método comandos() para analisar os comandos dentro do bloco
-        if self.current_token.token == 'BREAK': 
-            self.comando_de_parada() #Se houver um token break, chama o comando_de_parada()
-        if self.current_token.token == 'CONTINUE':
-            self.comando_de_continuacao() #Se houver continue, chama o método comando_de_continuacao()
         self.consume_token('CLOSE_BRACKET')
 
     def comando_leitura(self): #lida com a operação de leitura de entrada.
@@ -276,16 +278,17 @@ class Parser:
     def expressao(self): #lida com a análise de uma expressão
         print("[expressao] Analisando expressao")
         self.expressao_simples() #chama o método expressao_simples()
-        # verifica se o token atual está em (operadores de comparação)
-        while self.current_token.token in ('RELOP', 'ADD', 'SUB', 'MUL', 'DIV'):
+        # verifica se o token atual é um operador de comparação
+        while self.current_token and self.current_token.token in ('LESS_THAN_OP', 'GREATER_THAN_OP', 'EQUALS_OP', 'NOT_EQUAL_OP', 'LESS_OR_EQ_OP', 'GREATER_OR_EQ_OP'):
             operador = self.current_token.token
             self.consume_token(operador)
             self.expressao_simples()
 
-    def expressao_simples(self): #lida com a análise de uma expressão simples.
+    def expressao_simples(self): #lida com a análise de uma expressão simples
         print("[termo] Analisando expressao_simples")
         self.termo()
         while self.current_token.token in ('ADD', 'SUB'):
+            print(f"[expressao_simples] Operador encontrado: {self.current_token.token}")
             operador = self.current_token.token
             self.consume_token(operador)
             self.termo()
@@ -293,7 +296,8 @@ class Parser:
     def termo(self): #Este método lida com a análise de termos em expressões
         print("[termo] Analisando termo")
         self.fator() #Começa chamando o método fator()
-        while self.current_token.token in {'MUL', 'DIV'}:
+        while self.current_token.token in {'MULT', 'DIV'}:
+            print(f"[termo] Operador encontrado: {self.current_token.token}")
             operador = self.current_token.token
             self.consume_token(operador)
             self.fator()
@@ -307,11 +311,11 @@ class Parser:
                 if self.current_token.token != 'CLOSE_PARENTHESES':
                     self.lista_de_expressoes()
                 self.consume_token('CLOSE_PARENTHESES')
-        elif self.current_token.token == 'NUMBER':
-            self.consume_token('NUMBER')
+        elif self.current_token.token == 'NUMERIC':
+            self.consume_token('NUMERIC')
         elif self.current_token.token == 'OPEN_PARENTHESES':
             self.consume_token('OPEN_PARENTHESES')
             self.expressao()
             self.consume_token('CLOSE_PARENTHESES')
         else:
-            raise SyntaxError(f"Erro na linha {self.current_token.linha}: token inesperado '{self.current_token.lexema}'")
+            raise SyntaxError(f"Erro na linha {self.current_token.line}: token inesperado '{self.current_token.lexeme}'")

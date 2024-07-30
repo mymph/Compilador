@@ -1,25 +1,24 @@
 program MeuPrograma;
 int a, b, c;
 function soma(int x, int y) : int {
-    return x + y;
+    return z + y;
 }
 procedure imprimeSoma(int a, int b) {
     print(soma(a, b));
 }
-{
-    a = 10;
-    b = 20;
-    if (a < b) {
-        print(a);
-    } else {
-        print(b);
-    }
-    while (a != 0) {
-        a = a - 1;
-        if (a == 5) {
-            break;
-        }
-        continue;
-    }
-    input();
+int a, b;
+a = 10;
+b = 20;
+if (a < b) {
+    print(a);
+}else {
+    print(b);
 }
+while (a != 0) {
+    a = a - 1;
+    if (a == 5) {
+        break;
+    }
+    continue;
+}
+input();

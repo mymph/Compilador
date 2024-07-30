@@ -103,6 +103,14 @@ class Lexer:
                         self.char_index -= 1
                         break
 
+                case 'OPERATOR':
+                    if char in ("=", ">", "<"):
+                        continue
+                    else:
+                        term = term[:-1]
+                        self.char_index -= 1
+                        break
+
             if state is None and term not in (' ', '\n', '', '\t'):
                 print("Erro")
 
@@ -140,6 +148,21 @@ class Lexer:
             
             case 'DELIMITER':
                 self.tokens.append(Token(token=self.is_delimiter(lexeme), lexeme=lexeme, line=self.current_line))
+
+            case 'OPERATOR':
+                operator_token = {
+                    '==': 'EQUALS_OP',
+                    '!=': 'NOT_EQUAL_OP',
+                    '<': 'LESS_THAN_OP',
+                    '>': 'GREATER_THAN_OP',
+                    '<=': 'LESS_EQUAL_OP',
+                    '>=': 'GREATER_EQUAL_OP'
+                }.get(lexeme, None)
+
+                if operator_token:
+                    self.tokens.append(Token(token=operator_token, lexeme=lexeme, line=self.current_line))
+                else:
+                    print(f"Erro: Operador não reconhecido '{lexeme}' na linha {self.current_line}")
 
     def __str__(self):
         result = '-------------- Lexer ----------------\n'

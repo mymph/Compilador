@@ -3,8 +3,6 @@ RESERVED_KEYWORDS = {
   'HEADER_PROGRAM': 'program',
   'IF': 'if',
   'WHILE': 'while',
-
-  #ADICIONEI:
   'HEADER_PROC': 'procedure',
   'INT': 'int',
   'BOOL': 'bool',
