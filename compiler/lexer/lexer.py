@@ -4,6 +4,12 @@ from lexer.Symbol import Symbol
 from lexer.reserverd_keywords import RESERVED_KEYWORDS
 from lexer.delimiters import DELIMITERS 
 
+# Definindo códigos de cor ANSI
+RESET = '\033[0m'
+RED = '\033[31m'
+MAGENTA = '\033[35m'
+
+
 '''O Analisador léxico pega os caracteres de entrada e os transforma em tokens
 - Lê os caracteres de entrada e os agrupa em lexemas
 - Ignora espaços, tabulações e saltos de linha.
@@ -39,7 +45,7 @@ class Lexer:
             char = self.code[self.char_index]  # Pega o caractere e marca sua posição
             term += char  # Incrementa o caractere no token (termo) atual que está sendo lido
             self.char_index += 1
-            print(f"Estado anterior: {state} - char '{char}'")
+            print(f"{MAGENTA}Estado anterior: {state} - char '{char}'{RESET}")
 
             # Verifica o estado atual
             match state:
@@ -55,7 +61,7 @@ class Lexer:
                     elif char in ("!", '|', '&'):
                         continue
                     else:
-                        print("Erro")
+                        print(f"{RED} Erro: estado atual {RESET}")
                         term = term[:-1]  # Remove o caractere inválido
                         break
 
@@ -69,7 +75,7 @@ class Lexer:
                         self.char_index -= 1
                         break
                     else:
-                        print("Erro")
+                        print(f"{RED} Erro: ALPHA {RESET}")
                         term = term[:-1]  # Remove o caractere inválido
                         break
 
@@ -81,7 +87,7 @@ class Lexer:
                         self.char_index -= 1
                         break
                     else:
-                        print("Erro")
+                        print(f"{RED} Erro: ALPHANUM {RESET}")
                         term = term[:-1]  # Remove o caractere inválido
                         break
                 
@@ -93,7 +99,7 @@ class Lexer:
                         self.char_index -= 1
                         break
                     else:
-                        print("Erro")
+                        print(f"{RED} Erro: NUMERIC {RESET}")
                         term = term[:-1]  # Remove o caractere inválido
                         break
 
@@ -112,7 +118,7 @@ class Lexer:
                         break
 
             if state is None and term not in (' ', '\n', '', '\t'):
-                print("Erro")
+                print(f"{RED} Erro {RESET}")
 
         self.add_token_based_on_state(term, state)
 
@@ -162,7 +168,7 @@ class Lexer:
                 if operator_token:
                     self.tokens.append(Token(token=operator_token, lexeme=lexeme, line=self.current_line))
                 else:
-                    print(f"Erro: Operador não reconhecido '{lexeme}' na linha {self.current_line}")
+                    print(f"{RED}Erro: Operador não reconhecido '{lexeme}' na linha {self.current_line}{RESET}")
 
     def __str__(self):
         result = '-------------- Lexer ----------------\n'

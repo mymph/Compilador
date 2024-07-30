@@ -1,4 +1,9 @@
 #responsável por analisar a sequência de tokens gerada pelo analisador léxico.
+
+YELLOW = '\033[33m'
+RESET = '\033[0m'
+RED = '\033[31m'
+
 class Parser:
     def __init__(self, lexer): #lexer no main = Lexer(raw_code) ou seja, o codigo-fonte executado no lexer
         self.lexer = lexer #armazena aqui
@@ -18,7 +23,7 @@ class Parser:
             self.current_token = self.tokens[self.token_index] 
         else: #Caso n haja mais tokens, self.current_token como None indicará o fim dos tokens
             self.current_token = None
-        print(f"[next_token] Indice: {self.token_index}, Token: {self.current_token}")
+        print(f"{YELLOW}[next_token] Indice: {self.token_index}, Token: {self.current_token}{RESET}")
 
     #esse método vai consumir o token atual se ele corresponder ao tipo esperado
     def consume_token(self, token_type): #recebe um tipo como parâmetro
@@ -29,12 +34,12 @@ class Parser:
             print(f"[consume_token] Consumindo token: {self.current_token}")
             self.next_token()
         else: ##gera um erro indicando que o token esperado não foi encontrado
-            self.error(f"Esperado token {token_type}, mas foi encontrado {self.current_token}")
+            self.error(f"{YELLOW}Esperado token {token_type}, mas foi encontrado {self.current_token}{RESET}")
 
     #método chamado quando ocorre um erro durante a análise sintática
     def error(self, message): #parâmetro mensagem de erro
         #lança uma exceção SyntaxError com a mensagem de erro formatada, incluindo a linha onde o erro ocorreu (se disponível)
-        raise SyntaxError(f"Erro na linha {self.current_token.line if self.current_token else 'unknown'}: {message}")
+        raise SyntaxError(f"{RED}Erro na linha {self.current_token.line if self.current_token else 'unknown'}: {message}{RESET}")
 
     #o ponto de entrada para a análise sintática, chamando o método programa()
     def parse(self):
@@ -319,4 +324,4 @@ class Parser:
             self.expressao()
             self.consume_token('CLOSE_PARENTHESES')
         else:
-            raise SyntaxError(f"Erro na linha {self.current_token.line}: token inesperado '{self.current_token.lexeme}'")
+            raise SyntaxError(f"{RED}Erro na linha {self.current_token.line}: token inesperado '{self.current_token.lexeme}'{RESET}")

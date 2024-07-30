@@ -1,6 +1,10 @@
 from lexer.lexer import Lexer
 from parser.parser import Parser
 
+GREEN = '\033[32m'
+RESET = '\033[0m'
+RED = '\033[31m'
+
 lraw_code = ''
 
 with open('teste.txt', 'r') as f:
@@ -16,14 +20,13 @@ for token in tokens:
     print(token)
     print('\n')
 
- 
+
+print("************************************* parser ************************************")
 # Inicialização do Parser com o Lexer
 parser = Parser(lexer)
-
-
 # Execução do Parser
 try:
     parser.programa()  # Inicia a análise sintática a partir do ponto de entrada 'programa'
-    print("Parsing completed successfully!")
+    print(f"{GREEN}Parsing completed successfully!{RESET}")
 except SyntaxError as e:
-    print(f"Syntax error: {e}")
+        print(f"{RED}Syntax error: {e}{RESET}")
