@@ -1,9 +1,9 @@
 program MeuPrograma;
 int a, b, c;
-function soma(x, y) : int {
+function soma(int x, int y) : int {
     return x + y;
 }
-procedure imprimeSoma(a, b) {
+procedure imprimeSoma(int a, int b) {
     print(soma(a, b));
 }
 {

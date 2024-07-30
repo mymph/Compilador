@@ -18,6 +18,7 @@ class Parser:
             self.current_token = self.tokens[self.token_index] 
         else: #Caso n haja mais tokens, self.current_token como None indicará o fim dos tokens
             self.current_token = None
+        print(f"[next_token] Indice: {self.token_index}, Token: {self.current_token}")
 
     #esse método vai consumir o token atual se ele corresponder ao tipo esperado
     def consume_token(self, token_type): #recebe um tipo como parâmetro
@@ -25,6 +26,7 @@ class Parser:
         #verifica se existe um token atual e se o tipo do token atual (current_token.token) corresponde ao token_type recebido como parâmetro
         if self.current_token and self.current_token.token == token_type:
             #se a condição for verdadeira, chama o next_token simbolizando que aquele token foi consumido
+            print(f"[consume_token] Consumindo token: {self.current_token}")
             self.next_token()
         else: ##gera um erro indicando que o token esperado não foi encontrado
             self.error(f"Esperado token {token_type}, mas foi encontrado {self.current_token}")
@@ -36,10 +38,12 @@ class Parser:
 
     #o ponto de entrada para a análise sintática, chamando o método programa()
     def parse(self):
+        print("[parse] Iniciando análise sintática")
         self.programa()
 
     #método que representa a regra de análise para o início do programa.
     def programa(self):
+        print("[programa] Analisando programa")
         self.consume_token('HEADER_PROGRAM') #Consome o token de cabeçalho do programa.
         self.consume_token('IDENTIFIER') #Consome o identificador do programa.
         self.consume_token('SEMICOLON') #Consome o ponto e vírgula após o identificador.
@@ -47,26 +51,25 @@ class Parser:
 
     #método p corpo do programa, pode incluir declarações de variáveis, sub-rotinas e comandos.
     def corpo(self):
-        #if self.current_token.token == 'IDENTIFIER':
-        #    self.declaracao_de_variaveis()
-        #if self.current_token.token == 'HEADER_VAR':
-        #    self.declaracao_de_variaveis()
-        if self.current_token.token in ('int', 'bool'): #INT or BOOL"
-            self.declaracao_de_variaveis()
-
-        #Se o token atual for 'HEADER_FUNC' ou 'HEADER_PROC', ele chama declaracao_de_sub_rotinas()
-        if self.current_token.token == 'HEADER_FUNC' or self.current_token.token == 'HEADER_PROC':
-            self.declaracao_de_sub_rotinas()
+        print("[corpo] Analisando corpo")
+        while self.current_token and self.current_token.token in ('INT', 'BOOL', 'HEADER_FUNC', 'HEADER_PROC'):
+            if self.current_token.token in ('INT', 'BOOL'):
+                self.declaracao_de_variaveis()
+            elif self.current_token.token in ('HEADER_FUNC', 'HEADER_PROC'):
+                self.declaracao_de_sub_rotinas()
+        
         self.comandos()
 
 
     def declaracao_de_variaveis(self): #lida com a declaração de variáveis
+        print("[declaracao_de_variaveis] Analisando declaracao de variaveis")
         self.tipo() #chama a função tipo p analisar o tipo da variável
         self.lista_de_identificadores() 
         self.consume_token('SEMICOLON') #consome o token 'SEMICOLON'.
 
     def tipo(self): #analisa o tipo da variável
-        if self.current_token.token in {'INT', 'BOOL'}: 
+        if self.current_token.token in {'INT', 'BOOL'}:
+            print(f"[tipo] Tipo encontrado: {self.current_token.token}")
             #Se o token atual estiver em {'int', 'bool'}, consome o token correspondente
             #self.consume_token(self.current_token.token)
             self.next_token()
@@ -75,6 +78,7 @@ class Parser:
             self.error("Tipo esperado: 'int' ou 'bool'")
 
     def lista_de_identificadores(self): #lida com a análise da lista de identificadores (nomes de variáveis)
+        print("[lista_de_identificadores] Analisando lista de identificadores")
         self.consume_token('IDENTIFIER')
         #consome um token 'IDENTIFIER', que representa o nome de uma variável
         #entra em um loop que verifica se o token atual é vírgula
@@ -85,6 +89,7 @@ class Parser:
 
     #método lida com a declaração de sub-rotinas (funções ou procedimentos)
     def declaracao_de_sub_rotinas(self):
+        print("[declaracao_de_sub_rotinas] Analisando declaracao de sub-rotinas")
         #Ele verifica o tipo de cabeçalho atual (se é 'HEADER_PROC' ou 'HEADER_FUNC') e chama o método respectivo
         if self.current_token.token == 'HEADER_PROC':
             self.declaracao_de_procedimento()
@@ -92,6 +97,7 @@ class Parser:
             self.declaracao_de_funcao()
 
     def declaracao_de_procedimento(self): #lida com a declaração de procedimentos
+        print("[declaracao_de_procedimento] Analisando procedimento")
         self.consume_token('HEADER_PROC')
         self.consume_token('IDENTIFIER')
         self.consume_token('OPEN_PARENTHESES')
@@ -103,6 +109,7 @@ class Parser:
         self.consume_token('CLOSE_BRACKET')
 
     def declaracao_de_funcao(self): #lida com a declaração de funções.
+        print("[declaracao_de_funcao] Analisando funcao")
         self.consume_token('HEADER_FUNC')
         self.consume_token('IDENTIFIER')
         self.consume_token('OPEN_PARENTHESES')
@@ -112,25 +119,44 @@ class Parser:
         self.consume_token('COLON') #indica o tipo de retorno da função, dois pontos
         self.tipo() #tipo do retorno
         self.consume_token('OPEN_BRACKET')
-        self.corpo() #o método corpo analisa o corpo da função
-        self.retorno() #analisa a expressão de retorno da função
+        self.corpo_funcao()
         self.consume_token('CLOSE_BRACKET')
 
+    def corpo_funcao(self):
+        print("[corpo_funcao] Analisando corpo da funcao")
+        # Analisando comandos dentro do corpo da função
+        self.comandos()
+        # Verifica se há uma declaração de retorno ao final do corpo da função
+        if self.current_token.token == 'RETURN':
+            self.retorno()
+        else:
+            print("Aviso: Funcao sem comando RETURN")
+
+    def retorno(self): #lida com a análise de uma instrução de retorno
+        print("[retorno] Analisando retorno")
+        self.consume_token('RETURN')
+        self.expressao() #analisa a expressão usando o método expressao()
+        self.consume_token('SEMICOLON')
+
     def lista_de_parametros(self):
+        print("[lista_de_parametros] Analisando lista de parametros")
         self.parametro()
         while self.current_token.token == 'COMMA':
             self.consume_token('COMMA')
             self.parametro() #Esse processo continua enquanto houver vírgulas na lista de parâmetros
 
     def parametro(self): #Este método lida com a análise de um único parâmetro
+        print("[parametro] Analisando parametro")
         self.tipo()
         self.consume_token('IDENTIFIER')
 
     def comandos(self): #entra em loop enquanto o token atual estiver em {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT'}.
+        print("[comandos] Analisando comandos")
         while self.current_token.token in {'IDENTIFIER', 'IF', 'WHILE', 'RETURN', 'INPUT', 'PRINT'}:
             self.comando() #Para cada token válido, chama o método comando()
 
     def comando(self): #ida com um comando específico com base no tipo de token atual
+        print(f"[comando] Analisando comando: {self.current_token.token}")
         if self.current_token.token == 'IDENTIFIER':
             self.atribuicao_ou_chamada()
         elif self.current_token.token == 'IF':
@@ -144,21 +170,27 @@ class Parser:
         elif self.current_token.token == 'PRINT':
             self.comando_escrita()
 
-    def atribuicao_ou_chamada(self): #lida com a análise de uma atribuição ou chamada de procedimento
+    def atribuicao_ou_chamada(self):
+        print("[atribuicao_ou_chamada] Analisando atribuicao ou chamada")
         if self.current_token.token == 'IDENTIFIER':
             self.consume_token('IDENTIFIER')
-            #verifica se o próximo token é operador de atribuição. Se for, chama o método atribuicao
             if self.current_token.token == 'ASSIGNMENT_OP':
                 self.atribuicao()
-            elif self.current_token.token == 'OPEN_PARENTHESES': #se for abre parenteses, chamada de proc
-                self.chamada_de_procedimento()
+            elif self.current_token.token == 'OPEN_PARENTHESES': 
+                # Verificar se é uma chamada de função ou procedimento
+                if self.next_token.token == 'CLOSE_PARENTHESES' or self.next_token.token == 'IDENTIFIER':
+                    self.chamada_de_funcao()  # Chamada de função
+                else:
+                    self.chamada_de_procedimento()  # Chamada de procedimento
 
     def atribuicao(self): #Este método lida com a análise de uma atribuição
+        print("[atribuicao] Analisando atribuicao")
         self.consume_token('ASSIGNMENT_OP')
         self.expressao() #para analisar a expressão à direita da atribuição
         self.consume_token('SEMICOLON')
 
     def chamada_de_procedimento(self): #lida com a chamada de um procedimento
+        print("[chamada_de_procedimento] Analisando chamada de procedimento")
         self.consume_token('OPEN_PARENTHESES')
         if self.current_token.token != 'CLOSE_PARENTHESES':
             self.lista_de_expressoes()
@@ -166,6 +198,7 @@ class Parser:
         self.consume_token('SEMICOLON')
 
     def chamada_de_funcao(self): #lida com a chamada de uma função
+        print("[chamada_de_funcao] Analisando chamada de funcao")
         self.consume_token('OPEN_PARENTHESES')
         if self.current_token.token != 'CLOSE_PARENTHESES':
             self.lista_de_expressoes()
@@ -173,6 +206,7 @@ class Parser:
         self.consume_token('SEMICOLON')
 
     def comando_condicional(self): #lida com a estrutura condicional if
+        print("[comando_condicional] Analisando comando condicional")
         self.consume_token('IF')
         self.consume_token('OPEN_PARENTHESES')
         self.expressao() #Em seguida, analisa a expressão entre parênteses (condição do if)
@@ -187,6 +221,7 @@ class Parser:
             self.consume_token('CLOSE_BRACKET')
 
     def comando_enquanto(self): #Este método lida com a estrutura de loop while
+        print("[comando_enquanto] Analisando loop enquanto")
         self.consume_token('WHILE')
         self.consume_token('OPEN_PARENTHESES')
         self.expressao() #analisa a expressão entre parênteses (condição do while) usando o método expressao()
@@ -200,6 +235,7 @@ class Parser:
         self.consume_token('CLOSE_BRACKET')
 
     def comando_leitura(self): #lida com a operação de leitura de entrada.
+        print("[comando_leitura] Analisando comando de leitura")
         self.consume_token('INPUT')
         self.consume_token('OPEN_PARENTHESES')
         #n devia ter nada aqui???
@@ -207,6 +243,7 @@ class Parser:
         self.consume_token('SEMICOLON')
 
     def comando_escrita(self): #lida com a operação de escrita de saída (impressão)
+        print("[comando_escrita] Analisando comando de escrita")
         self.consume_token('PRINT')
         self.consume_token('OPEN_PARENTHESES')
         self.expressao() #analisa a expressão dentro dos parênteses usando o método expressao()
@@ -214,65 +251,67 @@ class Parser:
         self.consume_token('SEMICOLON')
 
     def comando_de_parada(self): #lida com o comando break dentro de um loop
+        print("[comando_de_parada] Analisando comando de parada")
         self.consume_token('BREAK')
         self.consume_token('SEMICOLON')
 
     def comando_de_continuacao(self): #lida com o comando continue dentro de um loop
+        print("[comando_de_continuacao] Analisando comando de continuacao")
         self.consume_token('CONTINUE')
         self.consume_token('SEMICOLON')
 
     def retorno(self): #lida com a análise de uma instrução de retorno
+        print("[retorno] Analisando retorno")
         self.consume_token('RETURN')
         self.expressao() #analisa a expressão usando o método expressao()
         self.consume_token('SEMICOLON')
 
     def lista_de_expressoes(self): #lida com a análise de uma lista de expressões
+        print("[lista_de_expressoes] Analisando lista de expressoes")
         self.expressao() #Começa chamando o método expressao()
         while self.current_token.token == 'COMMA': #Entra em um loop while que verifica se o token atual é 'COMMA'
             self.consume_token('COMMA') #Se for, consome a vírgula e chama dnv o método expressao() para analisar a próxima expressão
             self.expressao()
 
     def expressao(self): #lida com a análise de uma expressão
+        print("[expressao] Analisando expressao")
         self.expressao_simples() #chama o método expressao_simples()
         # verifica se o token atual está em (operadores de comparação)
-        if self.current_token.token in {'EQUALS_OP', 'NOT_EQUAL_OP', 'LESS_THAN_OP', 'LESS_OR_EQ_OP', 'GREATER_THAN_OP', 'GREATER_OR_EQ_OP'}:
-            #Se for o caso, chama novamente o método expressao_simples() para analisar a segunda parte da expressão
-            self.consume_token(self.current_token.token)
+        while self.current_token.token in ('RELOP', 'ADD', 'SUB', 'MUL', 'DIV'):
+            operador = self.current_token.token
+            self.consume_token(operador)
             self.expressao_simples()
 
     def expressao_simples(self): #lida com a análise de uma expressão simples.
-        if self.current_token.token in {'ADD', 'LESS'}: #Verifica se o token atual está em (operadores de adição ou subtração)
-            self.consume_token(self.current_token.token)
-        self.termo() #Chama o método termo() para analisar o token atual (ou próximo se tiver sido consumido)
-        while self.current_token.token in {'ADD', 'LESS', 'OR'}:
-            #Entra em um loop que verifica se o token atual está em (operadores lógicos)
-            self.consume_token(self.current_token.token)
-            self.termo() #consome o operador e chama novamente o método termo() para analisar o próximo termo
+        print("[termo] Analisando expressao_simples")
+        self.termo()
+        while self.current_token.token in ('ADD', 'SUB'):
+            operador = self.current_token.token
+            self.consume_token(operador)
+            self.termo()
 
     def termo(self): #Este método lida com a análise de termos em expressões
+        print("[termo] Analisando termo")
         self.fator() #Começa chamando o método fator()
-        while self.current_token.token in {'MULT', 'DIV', 'AND'}:
-            #Entra em um loop que verifica se o token atual está em (operadores de multiplicação, divisão ou lógicos)
-            #Se for o caso, consome o operador e chama novamente o método fator() para analisar o próximo fator
-            self.consume_token(self.current_token.token)
+        while self.current_token.token in {'MUL', 'DIV'}:
+            operador = self.current_token.token
+            self.consume_token(operador)
             self.fator()
 
     def fator(self): #lida com a análise de fatores em expressões
-        if self.current_token.token == 'NUMERIC': #Se for 'NUMERIC', consome o token (representando um valor numérico)
-            self.consume_token('NUMERIC') 
-        elif self.current_token.token == 'IDENTIFIER':
+        print("[fator] Analisando fator")
+        if self.current_token.token == 'IDENTIFIER':
             self.consume_token('IDENTIFIER')
-        #Se for 'OPEN_PARENTHESES', consome o parêntese de abertura, analisa a expressão dentro dos parênteses usando o método expressao(), e consome o parêntese de fechamento
+            if self.current_token.token == 'OPEN_PARENTHESES':
+                self.consume_token('OPEN_PARENTHESES')
+                if self.current_token.token != 'CLOSE_PARENTHESES':
+                    self.lista_de_expressoes()
+                self.consume_token('CLOSE_PARENTHESES')
+        elif self.current_token.token == 'NUMBER':
+            self.consume_token('NUMBER')
         elif self.current_token.token == 'OPEN_PARENTHESES':
             self.consume_token('OPEN_PARENTHESES')
             self.expressao()
             self.consume_token('CLOSE_PARENTHESES')
-        
-        #Se for 'true' ou 'false', consome o token (representando valores booleanos). Se for 'NOT', consome o token e chama novamente o método fator()
-        elif self.current_token.token == 'true' or self.current_token.token == 'false':
-            self.consume_token(self.current_token.token)
-        elif self.current_token.token == 'NOT':
-            self.consume_token('NOT')
-            self.fator()
         else:
-            self.error("Token inesperado em fator")
+            raise SyntaxError(f"Erro na linha {self.current_token.linha}: token inesperado '{self.current_token.lexema}'")
