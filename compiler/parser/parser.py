@@ -131,12 +131,28 @@ class Parser:
     def corpo_funcao(self):
         print("[corpo_funcao] Analisando corpo da funcao")
         # Analisando comandos dentro do corpo da função
-        self.comandos()
+        '''self.comandos()
         # Verifica se há uma declaração de retorno ao final do corpo da função
         if self.current_token.token == 'RETURN':
             self.retorno()
         else:
             print("Aviso: Funcao sem comando RETURN")
+        self.retorno()'''
+
+        return_found = False
+
+        while self.current_token.token != 'CLOSE_BRACKET':
+            if self.current_token.token == 'INT' or self.current_token.token == 'FLOAT':
+                self.declaracao_de_variaveis()
+            elif self.current_token.token == 'RETURN':
+                self.retorno()
+                return_found = True
+            else:
+                self.comandos()
+        
+        if not return_found:
+            self.error("Funcao deve ter um comando RETURN")
+
 
     def retorno(self): #lida com a análise de uma instrução de retorno
         print("[retorno] Analisando retorno")
@@ -185,6 +201,8 @@ class Parser:
     def atribuicao_ou_chamada(self):
         print("[atribuicao_ou_chamada] Analisando atribuicao ou chamada")
         if self.current_token.token == 'IDENTIFIER':
+            # Salva o identificador atual para determinar se é uma função ou um procedimento.
+            identifier_token = self.current_token
             self.consume_token('IDENTIFIER')
             if self.current_token.token == 'ASSIGNMENT_OP':
                 self.atribuicao()
@@ -221,7 +239,7 @@ class Parser:
         print("[comando_condicional] Analisando comando condicional")
         self.consume_token('IF')
         self.consume_token('OPEN_PARENTHESES')
-        self.expressao() #Em seguida, analisa a expressão entre parênteses (condição do if)
+        '''self.expressao() #Em seguida, analisa a expressão entre parênteses (condição do if)
         self.consume_token('CLOSE_PARENTHESES')
         self.consume_token('OPEN_BRACKET') #consome o token 'OPEN_BRACKET', indicando o início do bloco de código do if
         self.comandos() #Chama o método comandos() para analisar os comandos dentro do bloco
@@ -230,7 +248,58 @@ class Parser:
             self.consume_token('ELSE')
             self.consume_token('OPEN_BRACKET')
             self.comandos()
+            self.consume_token('CLOSE_BRACKET')'''
+
+        # Verifica se há uma expressão válida após '('
+        if self.is_valid_expression_start(self.current_token.token):
+            self.expressao()  # Analisa a expressão condicional
+        else:
+            self.error("Esperada expressao condicional valida apos 'if ('")
+
+        if self.current_token.token == 'CLOSE_PARENTHESES':
+            self.consume_token('CLOSE_PARENTHESES')
+        else:
+            self.error("Esperado ')' apos expressao condicional")
+        
+        self.consume_token('OPEN_BRACKET')
+        self.comandos()
+        self.consume_token('CLOSE_BRACKET')
+
+        if self.current_token.token == 'ELSE':
+            self.consume_token('ELSE')
+            self.consume_token('OPEN_BRACKET')
+            self.comandos()
             self.consume_token('CLOSE_BRACKET')
+
+    '''Verificar se o token atual pode ser o início de uma expressão válida.
+    Uma expressão válida pode começar com IDENTIFIER, NUMERIC, BOOL, OPEN_PARENTHESES
+    Argumento: token: O token atual a ser verificado.
+    Retorno bool: True se o token pode iniciar uma expressão válida, False caso contrário.'''
+    def is_valid_expression_start(self, token):
+        valid_starts = [
+            'IDENTIFIER',
+            'NUMERIC',
+            'BOOL',
+            'OPEN_PARENTHESES',
+        ]
+        return token in valid_starts
+
+    '''Verificar se a expressão é uma expressão completa com pelo menos um operador p garantir que a expressão não seja apenas um único identificador, etc
+    Retorno: True se for uma expressão completa, False se for um literal isolado.'''
+    def is_valid_complete_expression(self):
+        # Salva o token inicial e sua posição
+        start_token = self.current_token
+        token_index = self.token_index
+        
+        # Analisa uma expressão completa
+        self.expressao()
+        
+        # Verifica se a expressão consiste em apenas um token
+        if token_index == self.token_index or self.current_token.token == 'CLOSE_PARENTHESES':
+            # Se o índice do token não mudou, a expressão é inválida
+            return False
+            # A expressão é válida se o índice do token mudou
+        return True
 
     def comando_enquanto(self): #Este método lida com a estrutura de loop while
         print("[comando_enquanto] Analisando loop enquanto")
@@ -285,10 +354,16 @@ class Parser:
         print("[expressao] Analisando expressao")
         self.expressao_simples() #chama o método expressao_simples()
         # verifica se o token atual é um operador de comparação
-        while self.current_token and self.current_token.token in ('LESS_THAN_OP', 'GREATER_THAN_OP', 'EQUALS_OP', 'NOT_EQUAL_OP', 'LESS_OR_EQ_OP', 'GREATER_OR_EQ_OP'):
+        if self.current_token and self.current_token.token in ('LESS_THAN_OP', 'GREATER_THAN_OP', 'EQUALS_OP', 'NOT_EQUAL_OP', 'LESS_EQUAL_OP', 'GREATER_EQUAL_OP'):
             operador = self.current_token.token
             self.consume_token(operador)
             self.expressao_simples()
+
+            '''# Após um operador de comparação, deve haver outra expressão simples ou um literal booleano
+            if self.is_valid_expression_start(self.current_token.token):
+                self.expressao_simples()
+            elif self.current_token.token != 'CLOSE_PARENTHESES':
+                self.error(f"Esperada expressao valida apos o operador '{operador}', mas encontrado '{self.current_token.lexeme}'")'''
 
     def expressao_simples(self): #lida com a análise de uma expressão simples
         print("[termo] Analisando expressao_simples")
@@ -319,6 +394,8 @@ class Parser:
                 self.consume_token('CLOSE_PARENTHESES')
         elif self.current_token.token == 'NUMERIC':
             self.consume_token('NUMERIC')
+        #elif self.current_token.token == 'BOOL':  # Novo caso para booleanos
+        #    self.consume_token('BOOL')
         elif self.current_token.token == 'OPEN_PARENTHESES':
             self.consume_token('OPEN_PARENTHESES')
             self.expressao()

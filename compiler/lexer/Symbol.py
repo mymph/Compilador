@@ -15,5 +15,3 @@ class Symbol:
     str = f'({self.symbol_id}: "{self.lexeme}" - L{self.line}), SCOPE: {self.scope}, TYPE: {self.type}, {parameters_type_str}'
     
     return str
-
-  

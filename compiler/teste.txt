@@ -1,6 +1,8 @@
 program MeuPrograma;
 int a,b,c, resultado;
 function soma(int x, int y) : int {
+    int a;
+    a = 5;
     return x + y;
 }
 procedure imprimeSoma(int a, int b) {
@@ -8,7 +10,7 @@ procedure imprimeSoma(int a, int b) {
 }
 a = 10;
 b = 20;
-if (a < b) {
+if (a > b) {
     print(a);
 }else {
     print(b);
@@ -21,7 +23,7 @@ while (c != 0) {
         continue;
     }
 }
-imprimeSoma(c, b);
 resultado = soma(a, b);
 print(resultado);
+
 input();
