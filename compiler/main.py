@@ -28,5 +28,8 @@ parser = Parser(lexer)
 try:
     parser.programa()  # Inicia a análise sintática a partir do ponto de entrada 'programa'
     print(f"{GREEN}Parsing completed successfully!{RESET}")
+
+    parser.symbols_table.print_table()
+
 except SyntaxError as e:
         print(f"{RED}Syntax error: {e}{RESET}")

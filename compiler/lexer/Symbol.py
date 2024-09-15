@@ -3,7 +3,6 @@ class Symbol:
     self.lexeme = lexeme
     self.line = line
     self.symbol_id: str = None
-    self.scope: str = None
     self.type: str = None
     self.parameters_type: list[str] = []
 
@@ -12,6 +11,6 @@ class Symbol:
     for parameter_type in self.parameters_type:
       parameters_type_str += f'{parameter_type}, '
 
-    str = f'({self.symbol_id}: "{self.lexeme}" - L{self.line}), SCOPE: {self.scope}, TYPE: {self.type}, {parameters_type_str}'
+    str = f'({self.symbol_id}: "{self.lexeme}" - L{self.line}), TYPE: {self.type}, {parameters_type_str}'
     
     return str
