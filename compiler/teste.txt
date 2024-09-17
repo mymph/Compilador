@@ -1,5 +1,5 @@
 program MeuPrograma;
-int a,b,c,r;
+int a,b,c,r, resultado;
 function soma(int x, int y) : int {
     int x,y;
     a = 5;
@@ -25,4 +25,5 @@ while (c != 0) {
     }
 }
 r =  2 + 2 +2;
-imprimeSoma(a, b);
+imprimeSoma(a,b);
+resultado = soma(c,r);

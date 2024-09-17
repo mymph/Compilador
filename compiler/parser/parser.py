@@ -280,17 +280,33 @@ class Parser:
 
             # Obtém o próximo token sem consumir o IDENTIFIER
             next_token = self.get_next_token()
-
             if next_token and next_token.token == 'ASSIGNMENT_OP':
-                # Se for uma atribuição, consome o IDENTIFIER e trata a atribuição
+                # Pode ser uma atribuicao à chamada de função ou atribuicao à uma expressão normal
                 self.consume_token('IDENTIFIER')
-                self.atribuicao(identifier_token)
-            elif next_token and next_token.token == 'OPEN_PARENTHESES':
-                # Se for uma chamada de função ou procedimento, não consome o IDENTIFIER aqui
-                if self.get_next_token().token == 'CLOSE_PARENTHESES' or self.get_next_token().token == 'IDENTIFIER':
-                    self.chamada_de_funcao(identifier_token)  # Passa o identificador capturado
+
+                next_next_token = self.get_next_token() # Pega o próximo token (a direita da atribuição)
+                # Verifica se tem uma função declarada
+                if next_next_token.token == 'IDENTIFIER':
+                    try:
+                        symbol_info = self.symbols_table.get(next_next_token.lexeme)
+                        if symbol_info['id'] == 'HEADER_FUNC':
+                            # Se for uma função, trata como chamada de função
+                            self.consume_token('ASSIGNMENT_OP')
+                            self.chamada_de_funcao(next_next_token.lexeme)
+                        else:
+                            # Se não for uma função, trata como uma expressão normal
+                            self.atribuicao(identifier_token)
+                    except Exception as e:
+                        self.error(str(e))
+                        return
                 else:
-                    self.chamada_de_procedimento()  # Passa o identificador capturado
+                    # Caso contrário, trata como uma expressão normal
+                    self.atribuicao(identifier_token)
+            elif next_token and next_token.token == 'OPEN_PARENTHESES':
+                self.chamada_de_procedimento()
+                # Se satisfaz essa condição, é uma chamada de procedimento
+                #if self.get_next_token().token == 'CLOSE_PARENTHESES' or self.get_next_token().token == 'IDENTIFIER':
+                #    self.chamada_de_procedimento()
 
 
     def atribuicao(self, identifier_token):
@@ -403,6 +419,7 @@ class Parser:
             self.error(str(e))
             return
 
+        self.consume_token('IDENTIFIER')
         self.consume_token('OPEN_PARENTHESES')
         argumentos = []
 
@@ -442,7 +459,7 @@ class Parser:
             if argumento['tipo'] != expected_type:
                 self.error(f"Tipo do argumento {i+1} incorreto. Esperado: {expected_type}, Fornecido: {argumento['tipo']}")
                 return None
-
+        self.consume_token('SEMICOLON')
         print(f"Chamada da funcao '{identifier}' com {len(argumentos)} argumentos valida.")
         return func_info  # Retorna todas as informações da função, não apenas o tipo de retorno
 
