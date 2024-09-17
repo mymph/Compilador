@@ -23,6 +23,8 @@ class SymbolTable:
             print('\n')
             print(f"Nome: {identifier}")
             print(f"  Tipo: {symbol_info['tipo']}")
+            print(f"  ID: {symbol_info['id']}")
+
 
             if symbol_info['id'] == 'HEADER_FUNC':
                 print(f"  Retorno: {symbol_info['retorno']}")
@@ -34,6 +36,9 @@ class SymbolTable:
                 print(f"  Parametros:")
                 for param in symbol_info['parametros']:
                     print(f"    - {param['nome']}: {param['tipo']}")
+            elif symbol_info['id'] == 'VARIABLE':
+                print(f"  Valor: {symbol_info['valor']}")
+
             
             else:  # Variável
                 #print(f"  Tipo da Variavel: {symbol_info}")

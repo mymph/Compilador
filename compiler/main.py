@@ -7,6 +7,9 @@ RED = '\033[31m'
 
 lraw_code = ''
 
+with open('tac.txt', 'w') as file:
+    pass 
+
 with open('teste.txt', 'r') as f:
   raw_code = f.read()
 

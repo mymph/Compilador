@@ -1,0 +1,7 @@
+temp1 = ('x', None) + ('y', None)
+temp1 = ('a', {'tipo': 'NUMERIC', 'valor': '10'}) > ('b', {'tipo': 'NUMERIC', 'valor': '20'})
+temp1 = ('c', {'tipo': 'NUMERIC', 'valor': '10'}) != 0
+temp1 = ('c', {'tipo': 'NUMERIC', 'valor': '10'}) - 1
+temp1 = ('c', {'tipo': 'INT', 'operador': 'SUB', 'esquerda': {'tipo': 'INT', 'identificador': 'c'}, 'direita': {'tipo': 'NUMERIC', 'valor': '1'}}) == 5
+temp1 = 2 + 2
+temp2 = temp1 + 2

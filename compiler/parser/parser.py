@@ -64,7 +64,7 @@ class Parser:
             var_name = self.current_token.lexeme
             # Insere a variável na tabela de símbolos
             try:
-                self.symbols_table.insert(var_name, {'tipo': tipo_variavel, 'id': 'VARIABLE'})
+                self.symbols_table.insert(var_name, {'tipo': tipo_variavel, 'id': 'VARIABLE', 'valor': None})
             except Exception as e:
                 self.error(str(e))  # Chama função de erro e interrompe execução
                 return
@@ -314,6 +314,10 @@ class Parser:
         if expr is None:
             self.error(f"Erro ao analisar a expressão do lado direito da atribuição")
             return
+        # set a expressao como valor da atribuição 
+        symbol = self.symbols_table.get(identifier_token)
+        symbol['valor'] = expr
+
 
         # Consome o ponto e vírgula no final da atribuição
         if self.current_token.token == 'SEMICOLON':
@@ -599,7 +603,10 @@ class Parser:
 
     def expressao(self):
         print("[expressao] Analisando expressao")
-        
+        # código de 3 endereços
+        tac = Three_address_code('tac.txt', self.symbols_table)
+
+
         # Chama o método expressao_simples e armazena o resultado
         expr1 = self.expressao_simples()
         
@@ -631,15 +638,19 @@ class Parser:
             print("============================================= expressao ==============================================")
             print(expressao)
 
+            tac.generate(expressao)
+            tac.print_code()
+            tac.append_code_to_file()
+
             return expressao
         
         print("============================================= expressao expr1 ==============================================")
         
         print(expr1)
-        tac = Three_address_code()
+        
         tac.generate(expr1)
         tac.print_code()
- 
+        tac.append_code_to_file()
 
         
         # Se não houver um operador de comparação, retorna apenas expr1
