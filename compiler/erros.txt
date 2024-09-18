@@ -1,0 +1,44 @@
+Variável não declarada:
+u = 1 + 2;
+
+
+Variável já declarada:
+int a;
+
+
+Quantidade de parâmetros incompatíveis em chamada de função:
+int result;
+function teste(int i, int j) : int {
+    int i, j;
+    i = 1;
+    j = 1;
+    return i + j;
+}
+result = teste(i);
+
+
+Quantidade de paramêtros incompatíveis em chamada de função:
+procedure teste(int i, int j){
+    int i, j;
+    i = 1 + 1;
+}
+teste(i);
+
+
+Chamada de procedimento com atribuição:
+int result;
+procedure teste(int i, int j){
+    int i, j;
+    i = 1 + 1;
+}
+result = teste(i,j);
+
+
+Chamada de função sem atribuição:
+function teste(int i, int j) : int {
+    int i, j;
+    i = 1;
+    j = 1;
+    return i + j;
+}
+teste(i,j);

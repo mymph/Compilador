@@ -205,7 +205,7 @@ class Parser:
         tipo_expressao = self.expressao()  # Analisa a expressão e retorna seu tipo
         # Checagem semântica: verificar se o tipo da expressão é compatível com o tipo da função
         if tipo_expressao != self.current_function_type:
-            self.error(f"Tipo de retorno incompatível. Esperado: {self.current_function_type}, encontrado: {tipo_expressao}")
+            self.error(f"Tipo de retorno incompativel. Esperado: {self.current_function_type}, encontrado: {tipo_expressao}")
 
         self.consume_token('SEMICOLON')
 

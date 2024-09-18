@@ -1,9 +1,9 @@
 program MeuPrograma;
 int a,b,c,r, resultado;
-
 function soma(int x, int y) : int {
     int x,y;
-    a = 5;
+    x = 5;
+    y = 5;
     return x + y;
 }
 procedure imprimeSoma(int a, int b) {
