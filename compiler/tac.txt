@@ -1,7 +1,37 @@
-temp1 = ('x', None) + ('y', None)
-temp1 = ('a', {'tipo': 'NUMERIC', 'valor': '10'}) > ('b', {'tipo': 'NUMERIC', 'valor': '20'})
-temp1 = ('c', {'tipo': 'NUMERIC', 'valor': '10'}) != 0
-temp1 = ('c', {'tipo': 'NUMERIC', 'valor': '10'}) - 1
-temp1 = ('c', {'tipo': 'INT', 'operador': 'SUB', 'esquerda': {'tipo': 'INT', 'identificador': 'c'}, 'direita': {'tipo': 'NUMERIC', 'valor': '1'}}) == 5
-temp1 = 2 + 2
-temp2 = temp1 + 2
+temp1 = 5
+temp2 = ('x', None) + ('y', None)
+temp3 = ('a', {'tipo': 'NUMERIC', 'valor': '5'})
+temp4 = ('b', None)
+PRINT(temp4)
+temp5 = 20
+temp6 = 10
+temp7 = 20
+temp8 = ('a', {'tipo': 'NUMERIC', 'valor': '20'}) > ('b', {'tipo': 'NUMERIC', 'valor': '10'})
+IF temp8 GOTO IFA0_1
+IF !temp8 GOTO IFB0_1
+IFA0_1:
+temp9 = ('a', {'tipo': 'NUMERIC', 'valor': '20'})
+PRINT(temp9)
+GOTO IFA0_2
+IFB0_1:
+temp10 = ('b', {'tipo': 'NUMERIC', 'valor': '10'}) + 2
+PRINT(temp10)
+IFA0_2:
+temp11 = ('c', {'tipo': 'NUMERIC', 'valor': '20'}) != 0
+w0: while !temp11 GOTO fw0
+temp12 = ('c', {'tipo': 'NUMERIC', 'valor': '20'}) - 1
+temp13 = ('c', {'tipo': 'INT', 'operador': 'SUB', 'esquerda': {'tipo': 'INT', 'identificador': 'c'}, 'direita': {'tipo': 'NUMERIC', 'valor': '1'}}) == 5
+IF temp13 GOTO IFA1_1
+IF !temp13 GOTO IFB1_1
+IFA1_1:
+break
+GOTO IFA1_2
+IFB1_1:
+continue
+IFA1_2:
+GOTO w0
+fw0:
+temp14 = 2 + 2
+temp15 = temp14 + 2
+temp16 = ('a', {'tipo': 'NUMERIC', 'valor': '20'})
+temp17 = 2

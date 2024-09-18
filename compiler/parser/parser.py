@@ -1,6 +1,6 @@
 #analisador sintático e semântico acoplados
 from parser.SymbolTable import SymbolTable
-from three_address_code import Three_address_code
+from three_address_code import ThreeAddressCode
 
 
 YELLOW = '\033[33m'
@@ -15,6 +15,7 @@ class Parser:
         self.current_token = None
         self.token_index = -1
         self.next_token()
+        self.tac = ThreeAddressCode('tac.txt', self.symbols_table)
 
     def next_token(self):
         self.token_index += 1
@@ -465,11 +466,16 @@ class Parser:
 
     def comando_condicional(self): #lida com a estrutura condicional if
         print("[comando_condicional] Analisando comando condicional")
+        tac = self.tac
         self.consume_token('IF')
         self.consume_token('OPEN_PARENTHESES')
         # Verifica se há uma expressão válida após '('
         if self.is_valid_expression_start(self.current_token.token):
             self.expressao()  # Analisa a expressão condicional
+            #chama TAC do IF 
+            tac.generate_if()
+            tac.print_code()
+            tac.append_code_to_file()
         else:
             self.error("Esperada expressao condicional valida apos 'if ('")
 
@@ -478,15 +484,29 @@ class Parser:
         else:
             self.error("Esperado ')' apos expressao condicional")
         
+        # chama TAC do IFA
+        tac.generate_if_a1()
+        tac.print_code()
+        tac.append_code_to_file()
+
         self.consume_token('OPEN_BRACKET')
         self.comandos()
         self.consume_token('CLOSE_BRACKET')
 
+        tac.generate_GOTO_if_a2()
+
         if self.current_token.token == 'ELSE':
             self.consume_token('ELSE')
+            # chamo o tac do IFB
+            tac.generate_if_b1()
+            tac.print_code()
+            tac.append_code_to_file()
+
             self.consume_token('OPEN_BRACKET')
             self.comandos()
             self.consume_token('CLOSE_BRACKET')
+        
+        tac.generate_if_a2()
 
     '''Verificar se o token atual pode ser o início de uma expressão válida.
     Uma expressão válida pode começar com IDENTIFIER, NUMERIC, BOOL, OPEN_PARENTHESES
@@ -523,10 +543,14 @@ class Parser:
         self.consume_token('WHILE')
         self.consume_token('OPEN_PARENTHESES')
         self.expressao() #analisa a expressão entre parênteses (condição do while) usando o método expressao()
+        # TAC do while
+        self.tac.generate_while()
+
         self.consume_token('CLOSE_PARENTHESES')
         self.consume_token('OPEN_BRACKET')
         self.comandos() #chama o método comandos() para analisar os comandos dentro do bloco
         self.consume_token('CLOSE_BRACKET')
+        self.tac.generate_while_end()
 
     def comando_leitura(self): #lida com a operação de leitura de entrada.
         print("[comando_leitura] Analisando comando de leitura")
@@ -540,7 +564,9 @@ class Parser:
         print("[comando_escrita] Analisando comando de escrita")
         self.consume_token('PRINT')
         self.consume_token('OPEN_PARENTHESES')
-        self.expressao() #analisa a expressão dentro dos parênteses usando o método expressao()
+        self.expressao() #analisa a expressão dentro dos parênteses usando o método expressao()     
+        # TAC do print
+        self.tac.generate_print()
         self.consume_token('CLOSE_PARENTHESES')
         self.consume_token('SEMICOLON')
 
@@ -548,11 +574,13 @@ class Parser:
         print("[comando_de_parada] Analisando comando de parada")
         self.consume_token('BREAK')
         self.consume_token('SEMICOLON')
+        self.tac.generate_break()
 
     def comando_de_continuacao(self): #lida com o comando continue dentro de um loop
         print("[comando_de_continuacao] Analisando comando de continuacao")
         self.consume_token('CONTINUE')
         self.consume_token('SEMICOLON')
+        self.tac.generate_continue()
 
     def retorno(self): #lida com a análise de uma instrução de retorno
         print("[retorno] Analisando retorno")
@@ -621,7 +649,7 @@ class Parser:
     def expressao(self):
         print("[expressao] Analisando expressao")
         # código de 3 endereços
-        tac = Three_address_code('tac.txt', self.symbols_table)
+        tac = self.tac
 
 
         # Chama o método expressao_simples e armazena o resultado
@@ -652,10 +680,14 @@ class Parser:
                 'esquerda': expr1,
                 'direita': expr2
                 }
-            print("============================================= expressao ==============================================")
-            print(expressao)
+          
 
-            tac.generate(expressao)
+            generate = tac.generate(expressao)
+           
+            if type(generate) is tuple:
+                print("não é tupla")
+            elif generate.isnumeric():
+                tac.generate_simple_atribution(generate)
             tac.print_code()
             tac.append_code_to_file()
 
@@ -665,7 +697,14 @@ class Parser:
         
         print(expr1)
         
-        tac.generate(expr1)
+        generate = tac.generate(expr1)
+        
+        if type(generate) is tuple:
+            
+            tac.generate_simple_atribution(generate)
+        elif generate.isnumeric():
+            
+            tac.generate_simple_atribution(generate)
         tac.print_code()
         tac.append_code_to_file()
 

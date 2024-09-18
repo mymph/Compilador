@@ -1,6 +1,8 @@
-class Three_address_code:
+class ThreeAddressCode:
     def __init__(self, file_name, SymbolTable):
         self.temp_count = 0
+        self.if_count = 0
+        self.while_count = 0
         self.code = []
         self.file_name = file_name
         self.SymbolTable = SymbolTable
@@ -8,14 +10,17 @@ class Three_address_code:
     def new_temp(self):
         self.temp_count += 1
         return f"temp{self.temp_count}"
+    
+    def generate_simple_atribution(self, generate):
+        temp = self.new_temp()
+        self.code.append(f"{temp} = {generate}")
 
     def generate(self, node):
         if 'identificador' in node:
             expressao = (self.SymbolTable.get(node['identificador']))
             if expressao['id'] == "VARIABLE":
                 variable = self.generate(expressao)
-                return ( node['identificador'],variable)
-                
+                return ( node['identificador'],variable)               
             return node['identificador']
         elif 'valor' in node:
             return node['valor']
@@ -52,6 +57,45 @@ class Three_address_code:
         if op == 'OR':
             return '||'
         return ''
+
+    def generate_print(self):
+        self.code.append(f"PRINT(temp{self.temp_count})")
+
+    def generate_if(self):
+        self.code.append(f"IF temp{self.temp_count} GOTO IFA{self.if_count}_1")
+        self.code.append(f"IF !temp{self.temp_count} GOTO IFB{self.if_count}_1")
+        
+    
+    def generate_if_a1(self):
+        self.code.append(f"IFA{self.if_count}_1:")
+
+    def generate_if_b1(self):
+        self.code.append(f"IFB{self.if_count}_1:")
+
+    def generate_GOTO_if_a2(self):
+        self.code.append(f"GOTO IFA{self.if_count}_2")
+
+    def generate_if_a2(self):
+        self.code.append(f"IFA{self.if_count}_2:")
+        self.if_count += 1
+
+        
+    def generate_while(self):
+        self.code.append(f"w{self.while_count}: while !temp{self.temp_count} GOTO fw{self.while_count}")
+    
+    def generate_while_end(self):
+        self.code.append(f"GOTO w{self.while_count}")
+        self.code.append(f"fw{self.while_count}:")
+        self.while_count +=1
+
+    def generate_break(self):
+        self.code.append(f"break")
+
+    def generate_continue(self):
+        self.code.append(f"continue")
+
+
+
 
     def print_code(self):
         for line in self.code:
