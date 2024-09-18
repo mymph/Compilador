@@ -1,3 +1,0 @@
-temp1 = 1
-temp2 = 1
-temp3 = ('i', {'tipo': 'NUMERIC', 'valor': '1'}) + ('j', {'tipo': 'NUMERIC', 'valor': '1'})

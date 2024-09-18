@@ -6,6 +6,14 @@ Variável já declarada:
 int a;
 
 
+Erros de expressões:
+int g;
+g = 1 +;
+
+int g;
+g = + 1;
+
+
 Quantidade de parâmetros incompatíveis em chamada de função:
 int result;
 function teste(int i, int j) : int {
